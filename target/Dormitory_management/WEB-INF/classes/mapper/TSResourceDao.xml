@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gxy.dormitory.dao.TSResourceDao">
+
+    <resultMap type="org.gxy.dormitory.entity.TSResource" id="TSResourceMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="href" column="href" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="INTEGER"/>
+        <result property="resourcetype" column="resourceType" jdbcType="INTEGER"/>
+        <result property="parentid" column="parentid" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 菜单导航栏 -->
+    <select id="selectByRoleId" resultMap="TSResourceMap">
+    select TS_Res1.id,TS_Res1.createTime,TS_Res1.description,TS_Res1.href,TS_Res1.name ,TS_Res1.order_no,
+        TS_Res1.parentid,TS_Res1.resourceType,TS_Res12.id,TS_Res12.createTime, TS_Res12.description,
+        TS_Res12.href,TS_Res12.name,TS_Res12.order_no,TS_Res12.parentid ,
+        TS_Res12.resourceType
+    from T_S_ROLE_RESOURCE TS_Role_Res
+    inner join T_S_RESOURCE TS_Res1
+            on TS_Role_Res.resource_id=TS_Res1.id
+    left outer join
+        T_S_RESOURCE TS_Res12
+            on TS_Res1.parentid=TS_Res12.id
+    where TS_Role_Res.role_id=#{roleId}
+    </select>
+<!--查询所有资源-->
+    <select id="selectResourceAll" resultMap="TSResourceMap">
+        SELECT * FROM T_S_RESOURCE
+    </select>
+</mapper>

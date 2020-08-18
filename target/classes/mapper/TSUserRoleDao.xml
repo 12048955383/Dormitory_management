@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gxy.dormitory.dao.TSUserRoleDao">
+
+    <resultMap type="org.gxy.dormitory.entity.TSUserRole" id="TSUserRoleMap">
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="roleId" column="role_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <!-- 修改用户角色 -->
+    <insert id="insertRole">
+        INSERT INTO t_s_user_role (user_id, role_id )
+        VALUES(#{t_s_user_role.userId}, #{t_s_user_role.roleId})
+    </insert>
+    <!-- 如果有该角色则删除 -->
+    <delete id="deleteRole">
+        DELETE FROM t_s_user_role WHERE user_id =#{id}
+    </delete>
+</mapper>

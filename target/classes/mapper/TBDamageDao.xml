@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gxy.dormitory.dao.TBDamageDao">
+
+    <resultMap type="org.gxy.dormitory.entity.TBDamage" id="TBDamageMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="damagestation" column="damagestation" jdbcType="VARCHAR"/>
+        <result property="damagetime" column="damagetime" jdbcType="TIMESTAMP"/>
+        <result property="fixtime" column="fixtime" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="dormid" column="dormid" jdbcType="VARCHAR"/>
+        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="isfixed" column="isfixed" jdbcType="VARCHAR"/>
+            <association property="dorm" javaType="org.gxy.dormitory.entity.TBDorm">
+                <result property="dormname" column="dormname" jdbcType="VARCHAR"/>
+            </association>
+    </resultMap>
+    <!-- 查询宿舍损坏信息 -->
+    <select id="selectByDamage" resultMap="TBDamageMap">
+        SELECT t1.*,t2.dormname FROM t_b_damage t1 LEFT JOIN t_b_dorm t2 on t1.dormid = t2.id
+        <where>
+            <if test="dormname != null and dormname != '' ">
+                AND dormname LIKE '%${dormname}%'
+            </if>
+            <if test="isfixed != null and isfixed != '' ">
+                AND isfixed LIKE '%${isfixed}%'
+            </if>
+        </where>
+        ORDER BY t1.isfixed LIMIT #{indexStr},#{pageSize}
+    </select>
+    <!-- 查询宿舍损坏信息总数 -->
+    <select id="selectByDamageCount" resultType="integer">
+        SELECT COUNT(*) FROM t_b_damage LEFT JOIN t_b_dorm on t_b_damage.dormid =t_b_dorm.id
+        <where>
+            <if test="dormname != null and dormname != '' ">
+                AND dormname LIKE '%${dormname}%'
+            </if>
+            <if test="isfixed != null and isfixed != '' ">
+                AND isfixed LIKE '%${isfixed}%'
+            </if>
+        </where>
+    </select>
+    <!-- 修改宿舍损坏信息 -->
+    <update id="updateDamage">
+        UPDATE t_b_damage SET damagestation = #{t_b_damage.damagestation}, damagetime = #{t_b_damage.damagetime},
+                fixtime = #{t_b_damage.fixtime}, remark = #{t_b_damage.remark},
+                isfixed = #{t_b_damage.isfixed} , dormid = #{t_b_damage.dormid}
+    </update>
+    <!-- 添加宿舍损坏信息 -->
+    <insert id="insertDamage">
+        INSERT INTO dormitory.t_b_damage(id, damagestation, damagetime, fixtime, remark, dormid, createTime, isfixed)
+        VALUES (#{t_b_damage.id}, #{t_b_damage.damagestation}, #{t_b_damage.damagetime},
+        #{t_b_damage.fixtime}, #{t_b_damage.remark}, #{t_b_damage.dormid}, #{t_b_damage.createtime}, #{t_b_damage.isfixed})
+    </insert>
+    <!--删除宿舍损坏信息-->
+    <delete id="deleteDamage">
+        DELETE FROM t_b_damage WHERE id in
+        <foreach collection="ids" open="(" item="id" close=")"
+                 separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

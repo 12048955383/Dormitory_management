@@ -1,0 +1,24 @@
+{
+  "name" : "TSUserRole",
+  "comment" : null,
+  "fullColumn" : [ {
+    "name" : "userId",
+    "comment" : null,
+    "type" : null,
+    "shortType" : null,
+    "custom" : false,
+    "ext" : { }
+  }, {
+    "name" : "roleId",
+    "comment" : null,
+    "type" : null,
+    "shortType" : null,
+    "custom" : false,
+    "ext" : { }
+  } ],
+  "pkColumn" : null,
+  "otherColumn" : null,
+  "savePackageName" : "org.gxy.dormitory",
+  "savePath" : "./src/main/java/org/gxy/dormitory",
+  "saveModelName" : "Dormitory_management"
+}

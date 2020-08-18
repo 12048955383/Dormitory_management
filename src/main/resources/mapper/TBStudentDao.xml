@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gxy.dormitory.dao.TBStudentDao">
+
+    <resultMap type="org.gxy.dormitory.entity.TBStudent" id="TBStudentMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="qq" column="qq" jdbcType="VARCHAR"/>
+        <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+        <result property="classid" column="classid" jdbcType="VARCHAR"/>
+        <result property="dormid" column="dormid" jdbcType="VARCHAR"/>
+        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+        <association property="classes" javaType="org.gxy.dormitory.entity.TBClass">
+            <result property="id" column="classid" jdbcType="VARCHAR"/>
+            <result property="classname" column="classname" jdbcType="VARCHAR"/>
+        </association>
+        <association property="dorm" javaType="org.gxy.dormitory.entity.TBDorm">
+            <result property="id" column="dormid" jdbcType="VARCHAR"/>
+            <result property="dormname" column="dormname" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+    <!-- 学生管理信息查询 -->
+    <select id="selectByStudentInfo" resultMap="TBStudentMap" parameterType="org.gxy.dormitory.entity.TBStudent">
+        SELECT stu.id,dorm.id as dormid,class.id as classid,stu.`name`,
+        stu.sex,stu.birthday,stu.qq,stu.mobile,class.classname,
+        dorm.dormname
+        FROM t_b_student stu
+        LEFT JOIN t_b_class class ON stu.classid = class.id
+        LEFT JOIN t_b_dorm dorm ON stu.dormid = dorm.id
+        <where>
+            <if test="name != null and name !='' ">
+                AND name LIKE '%${name}%'
+            </if>
+            <if test="mobile != null and mobile != '' ">
+                AND mobile LIKE '%${mobile}%'
+            </if>
+            <if test="qq != null and qq !='' ">
+                AND qq LIKE '%${qq}%'
+            </if>
+            <if test="dormname != null and dormname !='' ">
+                AND dormname LIKE '%${dormname}%'
+            </if>
+        </where>
+        ORDER BY class.classname LIMIT #{indexStr},#{pageSize}
+    </select>
+    <!-- 查询总数 -->
+    <select id="selectByStudentCount" resultType="Integer">
+        SELECT COUNT(*) AS total FROM(SELECT stu.id,stu.dormid,stu.classid,stu.`name`,
+        stu.sex,stu.birthday,stu.qq,stu.mobile,class.classname,
+        dorm.dormname
+        FROM t_b_student stu
+        LEFT JOIN t_b_class class ON stu.classid = class.id
+        LEFT JOIN t_b_dorm dorm ON stu.dormid = dorm.id
+        <where>
+            <if test="name != null and name !='' ">
+                AND name LIKE '%${name}%'
+            </if>
+            <if test="mobile != null and mobile != '' ">
+                AND mobile LIKE '%${mobile}%'
+            </if>
+            <if test="qq != null and qq !='' ">
+                AND qq LIKE '%${qq}%'
+            </if>
+            <if test="dormname != null and dormname !='' ">
+                AND dormname LIKE '%${dormname}%'
+            </if>
+        </where>
+        )t1
+    </select>
+    <!-- 添加学生 -->
+    <insert id="insertStu" parameterType="org.gxy.dormitory.entity.TBStudent">
+        INSERT INTO
+        t_b_student (id, name, sex, birthday, qq, mobile, classid, dormid, createtime)
+        VALUES
+        (#{t_b_student.id}, #{t_b_student.name}, #{t_b_student.sex}, #{t_b_student.birthday}, #{t_b_student.qq}, #{t_b_student.mobile}, #{t_b_student.classid}, #{t_b_student.dormid}, #{t_b_student.createtime})
+    </insert>
+    <delete id="deleteByStuId">
+        DELETE FROM t_b_student WHERE id in
+        <foreach collection="ids" open="(" item="id" close=")"
+                 separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 修改学生信息 -->
+    <!-- 根据学生id查询学生信息 -->
+    <select id="selectByStuId" resultType="org.gxy.dormitory.entity.TBStudent">
+        SELECT * FROM t_b_student WHERE id = #{id}
+    </select>
+    <!-- 根据学生信息，拿到宿舍id进行查询宿舍信息 -->
+    <select id="selectByDormId" resultType="org.gxy.dormitory.entity.TBDorm">
+        SELECT * FROM t_b_dorm WHERE id = #{id}
+    </select>
+    <!-- 更新学生信息 -->
+    <update id="updateByStuId">
+        UPDATE t_b_student SET name = #{t_b_student.name} , sex = #{t_b_student.sex},birthday=#{t_b_student.birthday},qq =#{t_b_student.qq}, mobile=#{t_b_student.mobile},classid=#{t_b_student.classid},dormid=#{t_b_student.dormid} WHERE
+        id = #{t_b_student.id};
+    </update>
+    <!-- 更新宿舍信息 -->
+    <update id="updateByDormId">
+        UPDATE t_b_dorm SET used = #{t_b_dorm.used} WHERE id = #{t_b_dorm.id}
+    </update>
+</mapper>

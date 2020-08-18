@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gxy.dormitory.dao.TBVisitorDao">
+
+    <resultMap type="org.gxy.dormitory.entity.TBVisitor" id="TBVisitorMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="visitorname" column="visitorname" jdbcType="VARCHAR"/>
+        <result property="studentid" column="studentid" jdbcType="VARCHAR"/>
+        <result property="relationship" column="relationship" jdbcType="VARCHAR"/>
+        <result property="starttime" column="starttime" jdbcType="TIMESTAMP"/>
+        <result property="endtime" column="endtime" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+        <association property="student" javaType="org.gxy.dormitory.entity.TBStudent">
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <select id="selectByVisitor" resultMap="TBVisitorMap">
+        SELECT t.*,t2.NAME FROM t_b_visitor AS T LEFT JOIN t_b_student AS T2 ON T.studentid=T2.id
+        <where>
+            <if test="visitorname != null and visitorname != ''">
+                AND visitorname Like '%${visitorname}%'
+            </if>
+            <if test="name != null and name != ''">
+                AND name Like '%${name}%'
+            </if>
+            <if test="relationship != null and relationship != ''">
+                AND relationship Like '%${relationship}%'
+            </if>
+            <if test="starttime != null and starttime != ''">
+                AND starttime BETWEEN #{starttime} AND #{endtime}
+            </if>
+        </where>
+        ORDER BY t.starttime LIMIT #{indexStr},#{pageSize}
+    </select>
+    <!-- 总数 -->
+    <select id="selectByvisitorCount" resultType="Integer">
+        SELECT count(*)FROM(
+        SELECT t.*,t2.NAME FROM t_b_visitor AS T LEFT JOIN t_b_student AS T2 ON T.studentid=T2.id)t3
+        <where>
+            <if test="visitorname != null and visitorname != ''">
+                AND visitorname Like '%${visitorname}%'
+            </if>
+            <if test="name != null and name != ''">
+                AND name Like '%${name}%'
+            </if>
+            <if test="relationship != null and relationship != ''">
+                AND relationship Like '%${relationship}%'
+            </if>
+            <if test="starttime != null and starttime != ''">
+                AND starttime Like '%${starttime}%'
+            </if>
+            <if test="endtime != null and endtime != ''">
+                AND endtime Like '%${endtime}%'
+            </if>
+        </where>
+    </select>
+    <!-- 添加访客 -->
+    <insert id="insertVisitor">
+        INSERT INTO t_b_visitor
+        (id, visitorname, studentid, relationship, starttime, endtime, remark, createtime)
+        VALUES (#{t_b_visitor.id}, #{t_b_visitor.visitorname}, #{t_b_visitor.studentid}, #{t_b_visitor.relationship},
+         #{t_b_visitor.starttime}, #{t_b_visitor.endtime}, #{t_b_visitor.remark},#{t_b_visitor.createtime});
+    </insert>
+    <!-- 修改访客 -->
+    <update id="updateVisitor">
+        UPDATE t_b_visitor SET visitorname = #{t_b_visitor.visitorname}, relationship = #{t_b_visitor.relationship},
+        starttime = #{t_b_visitor.starttime}, endtime = #{t_b_visitor.endtime}, remark = #{t_b_visitor.remark}, createtime = #{t_b_visitor.createtime},
+        studentid = #{t_b_visitor.studentid}
+        WHERE id=#{t_b_visitor.id}
+    </update>
+    <!-- 删除访客 -->
+    <delete id="deleteVisitor">
+        DELETE FROM t_b_visitor WHERE id in
+        <foreach collection="ids" open="(" item="id" close=")"
+                 separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

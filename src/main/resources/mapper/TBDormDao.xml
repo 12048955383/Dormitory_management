@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gxy.dormitory.dao.TBDormDao">
+
+    <resultMap type="org.gxy.dormitory.entity.TBDorm" id="TBDormMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="dormname" column="dormname" jdbcType="VARCHAR"/>
+        <result property="total" column="total" jdbcType="INTEGER"/>
+        <result property="used" column="used" jdbcType="INTEGER"/>
+        <result property="dormadmin" column="dormadmin" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!-- 查询宿舍信息 -->
+    <select id="selectByDormInfo" resultMap="TBDormMap">
+        SELECT * FROM t_b_dorm
+        <where>
+            AND total > 0
+            <if test="dormname != null and dormname !='' ">
+                AND dormname LIKE '%${dormname}%'
+            </if>
+            <if test="total != null and total !='' ">
+                AND total LIKE '%${total}%'
+            </if>
+            <if test="dormadmin != null and dormadmin !='' ">
+                AND dormadmin LIKE '%${dormadmin}%'
+            </if>
+        </where>
+        ORDER BY remark desc LIMIT #{indexStr},#{pageSize}
+    </select>
+    <!-- 查询宿舍信息总数 -->
+    <select id="selectByDormCount" resultType="Integer">
+        SELECT count(*) from (SELECT * FROM t_b_dorm
+        <where>
+            AND total > 0
+            <if test="dormname != null and dormname !='' ">
+                AND dormname LIKE '%${dormname}%'
+            </if>
+            <if test="total > 0 ">
+                AND total LIKE '%${total}%'
+            </if>
+            <if test="dormadmin != null and dormadmin !='' ">
+                AND dormadmin LIKE '%${dormadmin}%'
+            </if>
+        </where>
+        )t1
+    </select>
+    <!-- 修改宿舍信息 -->
+    <update id="updateDorm">
+        UPDATE t_b_dorm SET
+        dormname = #{t_b_dorm.dormname}, total = #{t_b_dorm.total},
+        dormadmin = #{t_b_dorm.dormadmin},  remark = #{t_b_dorm.remark}
+        WHERE id = #{t_b_dorm.id};
+    </update>
+    <!-- 添加宿舍 -->
+    <insert id="insertDorm">
+        INSERT INTO t_b_dorm(id, dormname, total, used, dormadmin, remark, createTime)
+         VALUES (#{t_b_dorm.id}, #{t_b_dorm.dormname}, #{t_b_dorm.total},#{t_b_dorm.used}, #{t_b_dorm.dormadmin}, #{t_b_dorm.remark}, #{t_b_dorm.createtime})
+    </insert>
+    <!-- 删除宿舍 -->
+    <delete id="deleteDorm">
+        DELETE FROM t_b_dorm WHERE id in
+        <foreach collection="ids" open="(" item="id" close=")"
+                 separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

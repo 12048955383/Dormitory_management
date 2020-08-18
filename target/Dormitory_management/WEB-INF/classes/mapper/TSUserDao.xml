@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gxy.dormitory.dao.TSUserDao">
+
+    <resultMap type="org.gxy.dormitory.entity.TSUser" id="TSUserMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="position" column="position" jdbcType="VARCHAR"/>
+        <result property="positionDesc" column="position_desc" jdbcType="VARCHAR"/>
+        <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="username" column="userName" jdbcType="VARCHAR"/>
+        <result property="departid" column="departid" jdbcType="VARCHAR"/>
+        <collection property="roles" ofType="org.gxy.dormitory.entity.TSRole">
+            <result property="id" column="roleid" jdbcType="VARCHAR"/>
+            <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <!-- 登录查询 -->
+    <select id="selectByName" resultMap="TSUserMap">
+        SELECT id ,createTime ,departid,email,PASSWORD,phone,position,position_desc,real_name,STATUS ,username
+        FROM T_S_USER
+        <where>
+            <if test="username != null and username != ''">
+                and username =#{username}
+            </if>
+            <if test="PASSWORD != null and PASSWORD != ''">
+                and PASSWORD = #{password}
+            </if>
+        </where>
+    </select>
+    <!-- 用户管理 -->
+    <select id="selectAllUser" resultMap="TSUserMap">
+        SELECT * FROM T_S_USER
+         LIMIT #{indexStr},#{pageSize}
+    </select>
+    <!-- 用户总数 -->
+    <select id="selectAllUserByCount" resultType="integer">
+        SELECT COUNT(*) FROM T_S_USER
+    </select>
+    <!-- 用户管理模块->查询角色 -->
+    <select id="selectByRoleName" resultMap="TSUserMap">
+        SELECT user.*,roles.name,roles.description,roles.id as roleid
+        FROM T_S_USER user
+        INNER JOIN t_s_user_role t2 ON user.id = t2.user_id
+        INNER JOIN t_s_role roles ON t2.role_id = roles.id
+        WHERE  user.id = #{id}
+    </select>
+    <!-- 修改用户 -->
+    <update id="updateUserInfo">
+        UPDATE t_s_user
+        SET
+        email = #{t_s_user.email},
+        phone = #{t_s_user.phone},
+        position =  #{t_s_user.position},
+        position_desc = #{t_s_user.positionDesc},
+        real_name = #{t_s_user.realName},
+        STATUS = #{t_s_user.status}
+        WHERE
+            t_s_user.id = #{t_s_user.id}
+    </update>
+</mapper>

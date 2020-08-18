@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gxy.dormitory.dao.TBScoreDao">
+
+    <resultMap type="org.gxy.dormitory.entity.TBScore" id="TBScoreMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="score" column="score" jdbcType="INTEGER"/>
+        <result property="scoredate" column="scoredate" jdbcType="TIMESTAMP"/>
+        <result property="dormid" column="dormid" jdbcType="VARCHAR"/>
+        <result property="createtime" column="createTime" jdbcType="TIMESTAMP"/>
+        <association property="dorm" javaType="org.gxy.dormitory.entity.TBDorm">
+            <result property="dormname" column="dormname" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <!--查询宿舍评分信息-->
+    <select id="selectByScore" resultMap="TBScoreMap">
+        SELECT t_b_score.* , t_b_dorm.dormname
+        FROM t_b_score
+        LEFT JOIN t_b_dorm ON t_b_score.dormid = t_b_dorm.id
+        <where>
+            <if test="dormname != null and dormname != ''">
+                AND dormname LIKE '%${dormname}%'
+            </if>
+        </where>
+        ORDER BY t_b_dorm.dormname  LIMIT #{indexStr},#{pageSize}
+    </select>
+    <!-- 查询宿舍评分信息总数 -->
+    <select id="selectByScoreCount" resultType="integer">
+        SELECT COUNT(*) FROM t_b_score
+        LEFT JOIN t_b_dorm ON t_b_score.dormid = t_b_dorm.id
+        <where>
+            <if test="dormname != null and dormname != ''">
+                AND dormname LIKE '%${dormname}%'
+            </if>
+        </where>
+    </select>
+    <!-- 修改评分信息 -->
+    <update id="updateScore">
+        UPDATE t_b_score SET score = #{t_b_score.score}, scoredate = #{t_b_score.scoredate},
+        dormid =  #{t_b_score.dormid} WHERE id = #{t_b_score.id}
+    </update>
+    <!--添加评分信息-->
+    <insert id="insertScore">
+        INSERT INTO t_b_score(id, score, scoredate, dormid, createtime)
+    VALUES (#{t_b_score.id}, #{t_b_score.score}, #{t_b_score.scoredate}, #{t_b_score.dormid},#{t_b_score.createtime})
+    </insert>
+    <!--删除评分信息-->
+    <delete id="deleteScore">
+        DELETE FROM t_b_score WHERE id in
+        <foreach collection="ids" open="(" item="id" close=")"
+                 separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
